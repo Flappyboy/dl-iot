@@ -1,0 +1,34 @@
+spring:
+  profiles:
+    include: devse
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8004
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql: TRACE
+
+mqtt:
+  inbound:
+    url: tcp://127.0.0.1:61613
+    username: admin
+    password: password
+    clientId: iotPublisher
+    topics: iot
+  outbound:
+    urls: tcp://127.0.0.1:61613
+    username: admin
+    password: password
+    clientId: iotConsumer
+    topic: iot
+

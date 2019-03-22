@@ -1,6 +1,6 @@
 package cn.edu.nju.software.iot.iotcore.service.impl;
 
-import cn.edu.nju.software.iot.iotcore.entity.DoubleRecord;
+import cn.edu.nju.software.iot.iotcore.entity.Record;
 import cn.edu.nju.software.iot.iotcore.repository.RecordRepository;
 import cn.edu.nju.software.iot.iotcore.service.RecordService;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ public class RecordServiceImpl implements RecordService {
     private RecordRepository recordRepository;
 
     @Override
-    public void save(List<DoubleRecord> recordList) {
+    public void save(List<Record> recordList) {
         recordRepository.saveAll(recordList);
     }
 }

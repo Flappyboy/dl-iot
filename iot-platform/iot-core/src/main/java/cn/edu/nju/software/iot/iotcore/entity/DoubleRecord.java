@@ -1,20 +1,20 @@
 package cn.edu.nju.software.iot.iotcore.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import cn.edu.nju.software.iot.iotcore.entity.Record;
+import lombok.*;
 
-import java.sql.Types;
+import javax.persistence.Entity;
+import javax.persistence.Transient;
 
+@Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true)
+@NoArgsConstructor
 public class DoubleRecord extends Record {
-    private Double value;
 
-    public DoubleRecord() {
-        this.setDataType(Types.DOUBLE);
-    }
+    @Transient
+    private Double value;
 
     public Double getValue() {
         if(value==null){
