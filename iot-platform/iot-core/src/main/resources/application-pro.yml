@@ -1,0 +1,36 @@
+spring:
+  spring:
+    datasource:
+      url: jdbc:mysql://localhost:3306/dliot?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8091
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql: TRACE
+
+mqtt:
+  inbound:
+    url: tcp://127.0.0.1:61613
+    username: jach
+    password: 1832079HH1832080
+    clientId: iotPublisher
+    topics: records
+  outbound:
+    urls: tcp://127.0.0.1:61613
+    username: jach
+    password: 1832079HH1832080
+    clientId: iotConsumer
+    topic: records
+
