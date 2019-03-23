@@ -24,11 +24,11 @@ mqtt:
     username: admin
     password: password
     clientId: iotPublisher
-    topics: iot
+    topics: records
   outbound:
     urls: tcp://127.0.0.1:61613
     username: admin
     password: password
     clientId: iotConsumer
-    topic: iot
+    topic: records
 
