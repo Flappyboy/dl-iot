@@ -1,5 +1,9 @@
 package cn.edu.nju.software.iot.iotcore.mqtt;
 import cn.edu.nju.software.iot.iotcore.config.MqttProperties;
+import cn.edu.nju.software.iot.iotcore.dto.InputRecordsDto;
+import cn.edu.nju.software.iot.iotcore.service.RecordService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +24,8 @@ import org.springframework.messaging.MessagingException;
 public class MqttInboundConfiguration {
     @Autowired
     private MqttProperties mqttProperties;
+    @Autowired
+    private RecordService recordService;
     @Bean
     public MessageChannel mqttInputChannel() {
         return new DirectChannel();
@@ -44,9 +50,9 @@ public class MqttInboundConfiguration {
 
             @Override
             public void handleMessage(Message<?> message) throws MessagingException {
-                log.info("收到消息："+(String) message.getPayload());
+                InputRecordsDto inputRecordsDto = JSONObject.parseObject((String)message.getPayload(), InputRecordsDto.class);
+                recordService.save(inputRecordsDto.getRecords());
             }
-
         };
     }
 }
