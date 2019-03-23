@@ -22,13 +22,13 @@ logging:
 mqtt:
   inbound:
     url: tcp://127.0.0.1:61613
-    username: jach
+    username: admin
     password: 1832079HH1832080
     clientId: iotPublisher
     topics: records
   outbound:
     urls: tcp://127.0.0.1:61613
-    username: jach
+    username: admin
     password: 1832079HH1832080
     clientId: iotConsumer
     topic: records
