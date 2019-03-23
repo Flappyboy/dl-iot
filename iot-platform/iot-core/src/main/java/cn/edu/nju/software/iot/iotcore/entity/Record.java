@@ -1,5 +1,7 @@
 package cn.edu.nju.software.iot.iotcore.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,7 +24,8 @@ public class Record implements Serializable {
     @Column(nullable = false)
     private byte[] byteValue;
 
-    @ManyToOne
+    @JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sensorId", referencedColumnName = "id", nullable = false)
     private Sensor sensor;
 
@@ -35,4 +38,8 @@ public class Record implements Serializable {
 
 //    @Column(nullable = false)
 //    private int dataType;//数据类型 java.sql.types
+
+    public Object getValue(){
+        return byteValue;
+    }
 }

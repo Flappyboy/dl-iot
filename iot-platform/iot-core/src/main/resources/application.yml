@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 mqtt:
   inbound:

@@ -27,10 +27,10 @@ public class Device extends BaseEntity {
     private String type; //Ardunio
 
     @JsonBackReference(value = "devices")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gatewayId", referencedColumnName = "id", nullable = false)
     private Gateway gateway;
 
-    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Sensor> sensors;
 }

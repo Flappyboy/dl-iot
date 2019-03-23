@@ -37,5 +37,4 @@ public class GatewayController {
         List<Gateway> gatewayList = gatewayRepository.findAll();
         return new ResponseEntity(gatewayList,HttpStatus.OK);
     }
-
 }

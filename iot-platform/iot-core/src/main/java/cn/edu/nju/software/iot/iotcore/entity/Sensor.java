@@ -25,7 +25,7 @@ public class Sensor extends BaseEntity {
     private String state;// ON OFF
 
     @JsonBackReference(value = "sensors")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "deviceId", referencedColumnName = "id", nullable = false)
     private Device device;
 }

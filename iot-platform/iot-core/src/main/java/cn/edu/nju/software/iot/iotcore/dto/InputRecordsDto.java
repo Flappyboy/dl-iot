@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class AllRecordsDto {
+public class InputRecordsDto {
     List<DoubleRecordsDto> doubleRecords;
 
     public List<Record> getRecords(){

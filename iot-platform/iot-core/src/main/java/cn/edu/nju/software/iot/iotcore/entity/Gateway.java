@@ -22,6 +22,6 @@ public class Gateway extends BaseEntity {
     @Column(nullable = false)
     private String state;// ONLINE OFFLINE
 
-    @OneToMany(mappedBy = "gateway", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "gateway", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Device> devices;
 }
