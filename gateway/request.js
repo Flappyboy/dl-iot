@@ -42,7 +42,7 @@ function request_device(device) {
 	});
 }
 
-function request_sensor(sensor) {
+function request_sensor(sensor,state) {
 	request({
 		url: url_sensor,
 		method: 'POST',
@@ -52,7 +52,7 @@ function request_sensor(sensor) {
 		},
 		body: {
 			"id": sensor.id,
-			"state": "ONLINE",
+			"state": state,
 			"type": sensor.type,
 			"device": {
 				"id": sensor.device.id

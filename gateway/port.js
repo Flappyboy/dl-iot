@@ -108,9 +108,14 @@ function PortOpen() {
 						case "Distance":
 							{
 								if(switchs[1] == 0 && o.value > 0.00) {
-									req.request_sensor(sensor1);
+									req.request_sensor(sensor1,"ONLINE");
 									switchs[1] = 1;
 									console.log("超声波传感器已上线");
+								}
+								if(switchs[1]== 1&& o.value<=0.00){
+									req.request_sensor(sensor1,"OFFLINE");
+									switchs[1] = 0;
+									console.log("超声波传感器已下线");									
 								}
 								ultrasonic_record.push(o);
 								break;
@@ -118,9 +123,14 @@ function PortOpen() {
 						case "Tempeature":
 							{
 								if(switchs[2] == 0 && o.value != 0) {
-									req.request_sensor(sensor2);
+									req.request_sensor(sensor2,"ONLINE");
 									switchs[2] = 1;
 									console.log("温湿度传感器已上线");
+								}
+								if(switchs[2] == 1 && o.value == 0) {
+									req.request_sensor(sensor2,"OFFLINE");
+									switchs[2] = 0;
+									console.log("温湿度传感器已下线");
 								}
 								temperature_record.push(o);
 								break;
@@ -133,10 +143,11 @@ function PortOpen() {
 						case "LightSensor":
 							{
 								if(switchs[3] == 0 && o.value > 0) {
-									req.request_sensor(sensor3);
+									req.request_sensor(sensor3,"ONLINE");
 									switchs[3] = 1;
 									console.log("光敏传感器已上线");
 								}
+								
 								photoresistor_record.push(o);
 								break;
 							}
