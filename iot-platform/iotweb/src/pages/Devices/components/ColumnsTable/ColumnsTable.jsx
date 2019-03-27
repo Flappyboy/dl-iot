@@ -1,34 +1,9 @@
 import React, { Component } from 'react';
 import IceContainer from '@icedesign/container';
 import { Grid, Input, Table, Icon } from '@alifd/next';
-import { } from '../../../../api';
+import { queryDeviceList, queryRecordForSensor } from '../../../../api';
 
 const { Row, Col } = Grid;
-
-const mockData = {
-  users: [
-    {
-      avatar: require('./images/TB1j159r21TBuNjy0FjXXajyXXa-499-498.png_80x80.jpg'),
-      name: 'Susan Day',
-      email: 'carol@example.com',
-      access: 'vip',
-    },
-  ],
-  purchases: [
-    {
-      product: 'iPhone X',
-      date: 'today',
-      state: 'pending',
-      price: '$999.99',
-    },
-    {
-      product: 'MacBook Pro',
-      date: 'today',
-      state: 'pending',
-      price: '$2999.00',
-    },
-  ],
-};
 
 const accessColors = {
   vip: '#343A40',
@@ -51,22 +26,80 @@ export default class ColumnsTable extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.selectSensor = props.selectSensor;
+    this.state = {
+      deviceList: [],
+      deviceLoading: true,
+      sensorList: [],
+    };
   }
+
+  componentDidMount() {
+    // 声明一个自定义事件
+    // 在组件装载完成以后
+    // this.eventEmitter = emitter.addListener('query_statistics', this.queryStatistics);
+
+    this.updateDevice();
+  }
+
+  updateDevice = () => {
+    this.setState({
+      deviceLoading: true,
+    });
+    queryDeviceList().then((response) => {
+      this.setState({
+        deviceList: response.data,
+        deviceLoading: false,
+      });
+    })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  selectDevice = (device) => {
+    console.log(device);
+    this.setState({
+      sensorList: device.sensors,
+    });
+  }
+
+  // selectSensor = (sensor) => {
+  //   console.log(sensor);
+  // }
 
   handleSearch = (value) => {
     console.log(value);
   };
 
-  renderAvatar = (value) => {
-    return <img src={value} alt="" style={styles.userAvatar} />;
+  renderId = (value) => {
+    return (
+      <span style={{ ...styles.userAvatar }}>
+        {value}
+      </span>
+    );
   };
 
-  renderUserInfo = (value, index, record) => {
+  renderType = (value) => {
+    return (
+      <span style={{ ...styles.userName }}>
+        {value}
+      </span>
+    );
+  };
+
+  renderState = (value, index, device) => {
+    if (value === 'ONLINE') {
+      return (
+        <span style={{ ...styles.userName }}>
+          {value}
+        </span>
+      );
+    }
     return (
       <div style={styles.userInfo}>
-        <h6 style={styles.userName}>{record.name}</h6>
-        <p style={styles.userEmail}>{record.email}</p>
+        <h6 style={styles.userName}>{value}</h6>
+        <p style={styles.userEmail}>{device.lastModifiedDate}</p>
       </div>
     );
   };
@@ -79,11 +112,23 @@ export default class ColumnsTable extends Component {
     );
   };
 
-  renderOper = () => {
-    return <Icon type="search" style={styles.editIcon} />;
+  renderSelectDevice = (value, index, device) => {
+    return (
+      <span onClick={this.selectDevice.bind(this, device)}>
+        <Icon type="search" style={styles.editIcon} />
+      </span>
+    );
   };
 
-  renderState = (value) => {
+  renderSelectSensor = (value, index, sensor) => {
+    return (
+      <span onClick={this.selectSensor.bind(this, sensor)}>
+        <Icon type="search" style={styles.editIcon} />
+      </span>
+    );
+  };
+
+  renderStateA = (value) => {
     return (
       <span style={{ ...styles.purchasesState, color: stateColors[value] }}>
         {value}
@@ -97,7 +142,7 @@ export default class ColumnsTable extends Component {
           <Col xxx="24" s="12">
             <IceContainer style={{ padding: 0 }}>
               <h2 style={styles.title}>Device</h2>
-              <div style={styles.searchInputCol}>
+              {/* <div style={styles.searchInputCol}>
                 <Input
                   style={styles.searchInput}
                   placeholder="Search Users ..."
@@ -105,31 +150,31 @@ export default class ColumnsTable extends Component {
                   onChange={this.handleSearch}
                   size="large"
                 />
-              </div>
-              <Table dataSource={mockData.users} hasBorder={false}>
+              </div> */}
+              <Table dataSource={this.state.deviceList} hasBorder={false} loading={this.state.deviceLoading} >
                 <Table.Column
                   title="ID"
-                  dataIndex="avatar"
-                  cell={this.renderAvatar}
+                  dataIndex="id"
+                  cell={this.renderId}
                 />
                 <Table.Column
-                  title="GATEWAY"
-                  dataIndex="name"
-                  cell={this.renderUserInfo}
+                  title="TYPE"
+                  dataIndex="type"
+                  cell={this.renderType}
                 />
                 <Table.Column
                   title="STATE"
-                  dataIndex="access"
-                  cell={this.renderAccess}
+                  dataIndex="state"
+                  cell={this.renderState}
                 />
-                <Table.Column title="" cell={this.renderOper} />
+                <Table.Column title="" cell={this.renderSelectDevice} />
               </Table>
             </IceContainer>
           </Col>
           <Col xxx="24" s="12">
             <IceContainer style={{ padding: 0 }}>
               <h2 style={styles.title}>Sensor</h2>
-              <div style={styles.searchInputCol}>
+              {/* <div style={styles.searchInputCol}>
                 <Input
                   style={styles.searchInput}
                   placeholder="Search Purchases ..."
@@ -137,17 +182,24 @@ export default class ColumnsTable extends Component {
                   onChange={this.handleSearch}
                   size="large"
                 />
-              </div>
-              <Table dataSource={mockData.purchases} hasBorder={false}>
-                <Table.Column title="ID" dataIndex="product" />
-                <Table.Column title="STATE" dataIndex="date" />
+              </div> */}
+              <Table dataSource={this.state.sensorList} hasBorder={false} >
+                <Table.Column
+                  title="ID"
+                  dataIndex="id"
+                  cell={this.renderId}
+                />
+                <Table.Column
+                  title="TYPE"
+                  dataIndex="type"
+                  cell={this.renderType}
+                />
                 <Table.Column
                   title="STATE"
                   dataIndex="state"
                   cell={this.renderState}
                 />
-                <Table.Column title="PRICE" dataIndex="price" />
-                <Table.Column title="" cell={this.renderOper} />
+                <Table.Column title="" cell={this.renderSelectSensor} />
               </Table>
             </IceContainer>
           </Col>

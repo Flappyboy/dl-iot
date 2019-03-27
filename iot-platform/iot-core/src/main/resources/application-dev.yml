@@ -17,18 +17,3 @@ logging:
         type:
           descriptor:
             sql: TRACE
-
-mqtt:
-  inbound:
-    url: tcp://127.0.0.1:61613
-    username: admin
-    password: password
-    clientId: iotPublisher
-    topics: records
-  outbound:
-    urls: tcp://127.0.0.1:61613
-    username: admin
-    password: password
-    clientId: iotConsumer
-    topic: records
-

@@ -13,4 +13,6 @@ public interface RecordService {
     void save(List<Record> recordList);
 
     List<OutputRecordsDto> findForSensorBytime(Sensor sensor, Long startTime, Long endTime, String timeUnit);
+
+    List<OutputRecordsDto> findLast(Sensor sensor, Long last, String timeUnit);
 }

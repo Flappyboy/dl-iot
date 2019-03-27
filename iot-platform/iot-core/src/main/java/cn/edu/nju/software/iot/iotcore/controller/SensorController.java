@@ -34,5 +34,4 @@ public class SensorController {
         List<Sensor> sensorList = sensorRepository.findAll();
         return new ResponseEntity(sensorList,HttpStatus.OK);
     }
-
 }

@@ -38,3 +38,30 @@ export default {
   postUserLogout,
   getUserProfile,
 };
+
+const ip = 'localhost';
+const port = '8004';
+const base = '/api';
+const baseLocation = `http://${ip}:${port}${base}`;
+
+export async function queryRecordList() {
+  return axios({
+    url: `${baseLocation}/record/list`,
+    method: 'get',
+  });
+}
+
+export async function queryDeviceList() {
+  return axios({
+    url: `${baseLocation}/device/list`,
+    method: 'get',
+  });
+}
+
+export async function queryRecordForSensor(params) {
+  return axios({
+    url: `${baseLocation}/record/sensor/${params.id}`,
+    method: 'get',
+    params,
+  });
+}

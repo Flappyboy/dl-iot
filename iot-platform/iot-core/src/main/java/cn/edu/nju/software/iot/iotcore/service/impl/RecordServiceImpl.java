@@ -52,11 +52,25 @@ public class RecordServiceImpl implements RecordService {
             @Override
             public Predicate toPredicate(Root<Record> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> predicates = new ArrayList<>();
+                predicates.add(criteriaBuilder.equal(root.get("sensor"), sensor));
                 predicates.add(criteriaBuilder.between(root.get("recordTime"), sTime, eTime));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
         List<Record> recordList = recordRepository.findAll(spec);
+        return getOutputRecordsDtoList(recordList);
+    }
+
+    @Override
+    public List<OutputRecordsDto> findLast(Sensor sensor, Long last, String timeUnit) {
+        Long lasttime = recordRepository.findLastRecordTime(sensor);
+        if(lasttime == null){
+            return new ArrayList<>();
+        }
+        return findForSensorBytime(sensor, lasttime-last, lasttime, timeUnit);
+    }
+
+    private List<OutputRecordsDto> getOutputRecordsDtoList(List<Record> recordList){
         List<OutputRecordsDto> list = new ArrayList<>();
         Map<String, List<RecordDto>> map = new HashMap<>();
         for(Record r: recordList){
