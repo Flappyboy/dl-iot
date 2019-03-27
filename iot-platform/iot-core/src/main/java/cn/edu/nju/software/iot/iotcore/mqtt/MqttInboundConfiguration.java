@@ -22,6 +22,7 @@ import org.springframework.messaging.MessagingException;
 @Configuration
 @Slf4j
 public class MqttInboundConfiguration {
+
     @Autowired
     private MqttProperties mqttProperties;
     @Autowired
@@ -51,7 +52,7 @@ public class MqttInboundConfiguration {
             @Override
             public void handleMessage(Message<?> message) throws MessagingException {
                 InputRecordsDto inputRecordsDto = JSONObject.parseObject((String)message.getPayload(), InputRecordsDto.class);
-                recordService.save(inputRecordsDto.getRecords());
+                recordService.save(inputRecordsDto.getRecords(), "mqtt");
             }
         };
     }

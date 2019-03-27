@@ -10,15 +10,6 @@ spring:
 server:
   port: 8091
 
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-        type:
-          descriptor:
-            sql: TRACE
-
 mqtt:
   inbound:
     url: tcp://127.0.0.1:8031

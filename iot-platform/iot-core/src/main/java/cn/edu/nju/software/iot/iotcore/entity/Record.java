@@ -36,6 +36,8 @@ public class Record implements Serializable {
 
     private String mean;// 一个传感器可能传输多个值
 
+    private String recordWay;
+
 //    @Column(nullable = false)
 //    private int dataType;//数据类型 java.sql.types
 

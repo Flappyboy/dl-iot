@@ -13,7 +13,7 @@ export default class Devices extends Component {
   }
 
   selectSensor = (sensor) => {
-    console.log(sensor);
+    // console.log(sensor);
     this.setState({
       sensor,
     });

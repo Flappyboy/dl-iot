@@ -58,7 +58,7 @@ export default class ColumnsTable extends Component {
   }
 
   selectDevice = (device) => {
-    console.log(device);
+    // console.log(device);
     this.setState({
       sensorList: device.sensors,
     });
@@ -69,7 +69,7 @@ export default class ColumnsTable extends Component {
   // }
 
   handleSearch = (value) => {
-    console.log(value);
+    // console.log(value);
   };
 
   renderId = (value) => {

@@ -35,6 +35,15 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
+    public void save(List<Record> recordList, String recordWay) {
+        for (Record record :
+                recordList) {
+            record.setRecordWay(recordWay);
+        }
+        save(recordList);
+    }
+
+    @Override
     public List<OutputRecordsDto> findForSensorBytime(Sensor sensor, Long startTime, Long endTime, String timeUnit) {
         if(startTime == null){
             startTime = 0l;

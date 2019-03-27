@@ -57,7 +57,7 @@ export default class Record extends Component {
   }
 
   onRealTimeChange = (checked) => {
-    console.log(`switch to ${checked}`);
+    // console.log(`switch to ${checked}`);
   }
 
   onDateChange = (start, end) => {
@@ -65,8 +65,8 @@ export default class Record extends Component {
       startDate: start,
       endDate: end,
     });
-    console.log(start);
-    console.log(end);
+    // console.log(start);
+    // console.log(end);
   }
 
   queryFromDate = () => {
@@ -113,14 +113,14 @@ export default class Record extends Component {
       <div>
         <Row >
           <Col m={2} s={1} xs={0} />
-          <Col map={5} s={8} xs={16}>
+          <Col map={5} s={8} xs={12}>
             <CustomTimePicker onChange={this.onDateChange} />
           </Col>
-          <Col moment={1} s={2} xs={4}>
+          <Col moment={1} s={1} xs={4}>
             <Button type="primary" onClick={this.queryFromDate} >查询</Button>
           </Col>
           <Col m={12} s={4} xs={0} />
-          <Col m={2} s={6} xs={4}>
+          <Col m={2} s={6} xs={8}>
             <Switch style={large} checkedChildren="Real Time" disabled={this.state.disableRealTime} onChange={this.onRealTimeChange} unCheckedChildren="History" />
           </Col>
         </Row>

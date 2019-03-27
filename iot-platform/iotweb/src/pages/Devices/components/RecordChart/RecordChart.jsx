@@ -42,7 +42,6 @@ export default class RecordChart extends Component {
     this.state.record = nextProps.record;
     this.state.disableRealTime = nextProps.disableRealTime;
     this.setState({});
-    this.componentDidMount();
   }
 
   componentDidUpdate(prevProps) {
@@ -52,6 +51,11 @@ export default class RecordChart extends Component {
     //   myChart.hideLoading();
     //   this.loadData(this.props.data);
     // }
+    // console.log(prevProps);
+    if (prevProps.record === this.state.record) {
+      return;
+    }
+    this.componentDidMount();
   }
 
   componentDidMount() {
@@ -85,7 +89,7 @@ export default class RecordChart extends Component {
       pre = record.timestamp;
       this.data.push([time, record.value]);
     });
-    console.log(this.data);
+    // console.log(this.data);
     this.loadData();
   }
 
@@ -96,8 +100,8 @@ export default class RecordChart extends Component {
   }
 
   loadData = () => {
-    
-    
+
+
 
     // this.myChart.dispatchAction({
     //   type: 'brush',
@@ -164,7 +168,7 @@ export default class RecordChart extends Component {
     this.myChart.setOption(option);
 
     this.myChart.on('brushSelected', (params) => {
-      console.log(params);
+      // console.log(params);
       if (!params.batch[0].areas.length === 0) {
         this.selectedStart = null;
         this.selectedEnd = null;
@@ -183,9 +187,9 @@ export default class RecordChart extends Component {
       }
     });
 
-    this.myChart.on('mouseup', (params) => {
-      console.log(params);
-    });
+    // this.myChart.on('mouseup', (params) => {
+    //   console.log(params);
+    // });
     this.myChart.hideLoading();
     // setInterval(() => {
     //   for (let i = 0; i < 5; i++) {

@@ -12,6 +12,8 @@ import java.util.Map;
 public interface RecordService {
     void save(List<Record> recordList);
 
+    void save(List<Record> recordList, String recordWay);
+
     List<OutputRecordsDto> findForSensorBytime(Sensor sensor, Long startTime, Long endTime, String timeUnit);
 
     List<OutputRecordsDto> findLast(Sensor sensor, Long last, String timeUnit);

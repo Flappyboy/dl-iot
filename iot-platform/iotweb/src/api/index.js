@@ -39,8 +39,12 @@ export default {
   getUserProfile,
 };
 
-const ip = 'localhost';
-const port = '8004';
+// const ip = 'localhost';
+// const port = '8004';
+
+const ip = 'storymap.jach.top';
+const port = '8003';
+
 const base = '/api';
 const baseLocation = `http://${ip}:${port}${base}`;
 
