@@ -8,7 +8,10 @@
 #define DhtPin 7
 #define buzzerPin 12
 #define ledPin 13
-float cm_now,cm_last=-1,a=0.7;
+float cm_now,cm_last=-1,a=0.4;
+float tem_now,tem_last=999,hum_now,hum_last=999;
+int val_now,val_last=-1;
+
 dht11 DHT11;  
 SemaphoreHandle_t xSerialSemaphore;
 //QueueHandle_t xQueue;
@@ -98,6 +101,7 @@ void TaskDistenceRead(void *pvParameters)
     if(cm_last!=-1)
     {
       cm_now=(1-a)*cm_now+a*cm_last;
+    }
       if ( xSemaphoreTake( xSerialSemaphore, ( TickType_t ) 5 ) == pdTRUE )
       {
         Serial.print("Distance:");
@@ -106,7 +110,7 @@ void TaskDistenceRead(void *pvParameters)
 //        Serial.print("cm\n");
         xSemaphoreGive( xSerialSemaphore );
       }
-    }
+    
     cm_last=cm_now;
     
     vTaskDelay(1);    
@@ -121,19 +125,27 @@ void TaskTemHumRead( void *pvParameters)  // This is a Task.
     
     int chk = DHT11.read(DhtPin);                 //将读取到的值赋给chk
 
-    int tem=(float)DHT11.temperature;               //将温度值赋值给tem
-    int hum=(float)DHT11.humidity;                   //将湿度值赋给hum
+    tem_now=(float)DHT11.temperature;               //将温度值赋值给tem
+    hum_now=(float)DHT11.humidity;                   //将湿度值赋给hum
+    if(tem_last!=999){
+      tem_now=(1-a)*tem_now+a*tem_last;
+    }
+    if(hum_last!=999){
+      hum_now=(1-a)*hum_now+a*hum_last;
+    }
     if ( xSemaphoreTake( xSerialSemaphore, ( TickType_t ) 5 ) == pdTRUE )
     {    
+      
       Serial.print("Tempeature:");                        //打印出Tempeature:
-      Serial.println(tem);                                     //打印温度结果
-//      Serial.println(",");
+      Serial.println(tem_now);                                     //打印温度结果
+
       Serial.print("Humidity:");                            //打印出Humidity:
-      Serial.println(hum);                                     //打印出湿度结果
-//      Serial.println(",");
-//      Serial.println("%");  
+      Serial.println(hum_now);                                     //打印出湿度结果
+
       xSemaphoreGive( xSerialSemaphore );
     }     
+    tem_last=tem_now;
+    hum_last=hum_now;
     vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
   }
 }
@@ -143,12 +155,16 @@ void TaskLightSensorRead( void *pvParameters )  // This is a Task.
   
   for (;;)
   {    
-    int val = analogRead(A0);
+    val_now = analogRead(A0);
 //    xQueueSend(xQueue, (void *)&val, (TickType_t)10);
+    if(val_last!=-1){
+       val_now=(1-a)*val_now+a*val_last;
+    }
+    val_last=val_now;
     if ( xSemaphoreTake( xSerialSemaphore, ( TickType_t ) 5 ) == pdTRUE )
     {
       Serial.print("LightSensor:"); 
-      Serial.println(val);
+      Serial.println(val_now);
 //      Serial.println(",");
       xSemaphoreGive( xSerialSemaphore );
     }

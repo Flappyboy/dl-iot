@@ -26,7 +26,7 @@ function request_gateway() {
 	});
 }
 
-function request_device(device) {
+function request_device(device,state) {
 	request({
 		url: url_device,
 		method: 'POST',
@@ -36,7 +36,7 @@ function request_device(device) {
 		},
 		body: {
 			"id": device.id,
-			"state": "ONLINE",
+			"state": state,
 			"type": device.type,
 			"gateway": {
 				"id": device.gateway.id

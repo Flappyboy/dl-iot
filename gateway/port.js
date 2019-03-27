@@ -78,101 +78,106 @@ var serialPort = new SerialPort(
 		flowControl: false
 	}, false);
 var d = '';
-
+var close_b = Date.parse(new Date());
 
 function PortOpen() {
-
-	serialPort.open(function(error) {
-		if(error) {
-			console.log("打开端口" + portName + "错误：" + error);
-			setTimeout(PortOpen, 5000);
-		} else {
-			console.log("打开端口成功，正在监听数据中");
-			req.request_device(device);
-			console.log("设备已连接");
-			
-			serialPort.on('data', function(data) {
-				// console.log(data);
-				d += data.toString('utf8');
-				var dd = d.split('\n');
-				d = dd[dd.length - 1];
-				dd.pop();
-
-				for(var i = 0; i < dd.length; i++) {
-					var sub_dd = dd[i].split(':');
-					var o = {
-						timestamp: Date.parse(new Date()).toString(),
-						value: sub_dd[1]
-					};
-					switch(sub_dd[0]) {
-						case "Distance":
-							{
-								if(switchs[1] == 0 && o.value > 0.00) {
-									req.request_sensor(sensor1,"ONLINE");
-									switchs[1] = 1;
-									console.log("超声波传感器已上线");
-								}
-								if(switchs[1]== 1&& o.value<=0.00){
-									req.request_sensor(sensor1,"OFFLINE");
-									switchs[1] = 0;
-									console.log("超声波传感器已下线");									
-								}
-								ultrasonic_record.push(o);
-								break;
-							}
-						case "Tempeature":
-							{
-								if(switchs[2] == 0 && o.value != 0) {
-									req.request_sensor(sensor2,"ONLINE");
-									switchs[2] = 1;
-									console.log("温湿度传感器已上线");
-								}
-								if(switchs[2] == 1 && o.value == 0) {
-									req.request_sensor(sensor2,"OFFLINE");
-									switchs[2] = 0;
-									console.log("温湿度传感器已下线");
-								}
-								temperature_record.push(o);
-								break;
-							}
-						case "Humidity":
-							{
-								humidity_record.push(o);
-								break;
-							}
-						case "LightSensor":
-							{
-								if(switchs[3] == 0 && o.value > 0) {
-									req.request_sensor(sensor3,"ONLINE");
-									switchs[3] = 1;
-									console.log("光敏传感器已上线");
-								}
-								
-								photoresistor_record.push(o);
-								break;
-							}
-					}
-				}
-
-				if(photoresistor_record[photoresistor_record.length - 1].value < 600) {
-					//				console.log("111")
-					serialPort.write('1');
+	return function n() {
+		if(!serialPort.isOpen) {
+			serialPort.open(function(error) {
+				if(error) {
+					console.log("打开端口" + portName + "错误：" + error);
+					setTimeout(PortOpen, 5000);
 				} else {
-					//				console.log("000")
-					serialPort.write('0');
-				}
-				if(ultrasonic_record[ultrasonic_record.length - 1].value < 20.00) {
-					//				console.log("222")
-					serialPort.write('2');
-				} else {
-					//				console.log("333")
-					serialPort.write('3');
-				}
+					console.log("打开端口成功，正在监听数据中");
+					close_b = Date.parse(new Date());
+					req.request_device(device,"ONLINE");
+					console.log("设备已连接");
 
+					serialPort.on('data', function(data) {
+						close_b = Date.parse(new Date());
+						//				 console.log(data);
+						d += data.toString('utf8');
+						var dd = d.split('\n');
+						d = dd[dd.length - 1];
+						dd.pop();
+
+						for(var i = 0; i < dd.length; i++) {
+							var sub_dd = dd[i].split(':');
+							var o = {
+								timestamp: Date.parse(new Date()).toString(),
+								value: sub_dd[1]
+							};
+							switch(sub_dd[0]) {
+								case "Distance":
+									{
+										if(switchs[1] == 0 && o.value > 0.00) {
+											req.request_sensor(sensor1, "ONLINE");
+											switchs[1] = 1;
+											console.log("超声波传感器已上线");
+										}
+										if(switchs[1] == 1 && o.value <= 0.00) {
+											req.request_sensor(sensor1, "OFFLINE");
+											switchs[1] = 0;
+											console.log("超声波传感器已下线");
+										}
+										ultrasonic_record.push(o);
+										break;
+									}
+								case "Tempeature":
+									{
+										if(switchs[2] == 0 && o.value != 0) {
+											req.request_sensor(sensor2, "ONLINE");
+											switchs[2] = 1;
+											console.log("温湿度传感器已上线");
+										}
+										if(switchs[2] == 1 && o.value == 0) {
+											req.request_sensor(sensor2, "OFFLINE");
+											switchs[2] = 0;
+											console.log("温湿度传感器已下线");
+										}
+										temperature_record.push(o);
+										break;
+									}
+								case "Humidity":
+									{
+										humidity_record.push(o);
+										break;
+									}
+								case "LightSensor":
+									{
+										if(switchs[3] == 0 && o.value > 0) {
+											req.request_sensor(sensor3, "ONLINE");
+											switchs[3] = 1;
+											console.log("光敏传感器已上线");
+										}
+
+										photoresistor_record.push(o);
+										break;
+									}
+							}
+						}
+
+						if(photoresistor_record[photoresistor_record.length - 1].value < 600) {
+							//				console.log("111")
+							serialPort.write('2');
+						} else {
+							//				console.log("000")
+							serialPort.write('3');
+						}
+						if(temperature_record[temperature_record.length - 1].value > 25.00) {
+							//				console.log("222")
+							serialPort.write('1');
+						} else {
+							//				console.log("333")
+							serialPort.write('0');
+						}
+
+					});
+
+				}
 			});
-					
 		}
-	});
+	}
 }
 
 function refreshCount(record, index, subindex) {
@@ -204,20 +209,36 @@ function refreshCount(record, index, subindex) {
 				value: sum / count
 			};
 			s.push(o);
-			
+
 			eval("record" + index)[subindex].recordList = s.slice(0, -1);
 			if(index < 3) req.request_record(eval("record" + index));
 			else req_mqtt.request_record(eval("record" + index));
-			s.splice(0,s.length);
+			s.splice(0, s.length);
 			record.splice(0, record.length - 1);
 		}
 	}
 }
+
+function PortClose() {
+	return function n() {
+		if(Date.parse(new Date()) - close_b > 3000 && serialPort.isOpen) {
+			
+			serialPort.close(function(error) {
+				console.log("端口已关闭");
+				req.request_device(device,"OFFLINE");
+				console.log("设备已下线");
+				switchs=[0,0,0,0];
+			});
+		}
+	}
+}
+
 setInterval(refreshCount(ultrasonic_record, 1, 0), 3000);
 setInterval(refreshCount(temperature_record, 2, 0), 3000);
 setInterval(refreshCount(humidity_record, 2, 1), 3000);
 setInterval(refreshCount(photoresistor_record, 3, 0), 3000);
-
+setInterval(PortClose(), 5000);
+setInterval(PortOpen(), 3000);
 module.exports = {
 	PortOpen
 }
