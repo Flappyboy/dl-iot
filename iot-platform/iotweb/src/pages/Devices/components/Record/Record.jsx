@@ -14,11 +14,14 @@ export default class Record extends Component {
 
   static defaultProps = {};
 
+  readyForRealTime = false;
+
   constructor(props) {
     super(props);
     this.state = {
       sensor: props.sensor,
-      disableRealTime: true,
+      realTime: false,
+      disableSwitch: false,
       records: [],
       startDate: -1,
       endDate: -1,
@@ -51,13 +54,22 @@ export default class Record extends Component {
       this.setState({
         records: response.data,
       });
+      this.readyForRealTime = true;
     }).catch((error) => {
       console.log(error);
     });
   }
 
   onRealTimeChange = (checked) => {
-    // console.log(`switch to ${checked}`);
+    console.log(`switch to ${checked}`);
+    // if (this.readyForRealTime) {
+    // this.state.realTime = checked;
+    // this.setState({
+    //   realTime: checked,
+    // });
+    // } else {
+    //   this.componentDidMount();
+    // }
   }
 
   onDateChange = (start, end) => {
@@ -79,20 +91,24 @@ export default class Record extends Component {
       this.setState({
         records: response.data,
       });
+      this.readyForRealTime = false;
     }).catch((error) => {
       console.log(error);
     });
   }
+
   queryFromTime = (start, end) => {
     const params = {
       id: this.state.sensor.id,
       startTime: start,
       endTime: end,
+      limit: 700,
     };
     queryRecordForSensor(params).then((response) => {
       this.setState({
         records: response.data,
       });
+      this.readyForRealTime = false;
     }).catch((error) => {
       console.log(error);
     });
@@ -102,7 +118,7 @@ export default class Record extends Component {
     return (
       <div>
         {this.state.records.map((record) => (
-          <RecordChart sensor={this.state.sensor} record={record} disableRealTime={this.state.disableRealTime} selectTime={this.queryFromTime.bind(this)} />
+          <RecordChart sensor={this.state.sensor} record={record} realTime={this.state.realTime} selectTime={this.queryFromTime.bind(this)} />
         ))}
       </div>
     );
@@ -113,15 +129,15 @@ export default class Record extends Component {
       <div>
         <Row >
           <Col m={2} s={1} xs={0} />
-          <Col map={5} s={8} xs={12}>
+          <Col map={5} s={7} xs={12}>
             <CustomTimePicker onChange={this.onDateChange} />
           </Col>
           <Col moment={1} s={1} xs={4}>
             <Button type="primary" onClick={this.queryFromDate} >查询</Button>
           </Col>
-          <Col m={12} s={4} xs={0} />
-          <Col m={2} s={6} xs={8}>
-            <Switch style={large} checkedChildren="Real Time" disabled={this.state.disableRealTime} onChange={this.onRealTimeChange} unCheckedChildren="History" />
+          <Col m={12} s={1} xs={0} />
+          <Col m={2} s={4} xs={8}>
+            <Switch style={large} checkedChildren="Real Time" disabled={this.state.disableSwitch} onChange={this.onRealTimeChange} unCheckedChildren="History" />
           </Col>
         </Row>
         {this.renderChart()}

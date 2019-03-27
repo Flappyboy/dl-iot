@@ -40,14 +40,14 @@ public class RecordController {
     }
 
     @GetMapping("/sensor/{id}")
-    public ResponseEntity getDoubleRecordsForTime(@PathVariable String id, Long startTime, Long endTime, String timeUnit, Long last){
+    public ResponseEntity getDoubleRecordsForTime(@PathVariable String id, Long startTime, Long endTime, Long limit, Long last, String mean){
         Sensor sensor = new Sensor();
         sensor.setId(id);
         List<OutputRecordsDto> result = null;
         if(startTime<0 && endTime<0 && last!=null && last>0){
-            result = recordService.findLast(sensor, last, timeUnit);
+            result = recordService.findLast(sensor, last, limit);
         }else{
-            result = recordService.findForSensorBytime(sensor, startTime, endTime, timeUnit);
+            result = recordService.findForSensorBytime(sensor, startTime, endTime, limit, mean);
         }
         return new ResponseEntity(result, HttpStatus.OK);
     }

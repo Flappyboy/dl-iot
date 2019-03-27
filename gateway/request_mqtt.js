@@ -1,8 +1,23 @@
 var mqtt = require('mqtt');
-var client = mqtt.connect('mqtt://storymap.jach.top:8031', {
-//	username: 
-//	password: 
-//	clientId: 
+// var client = mqtt.connect('mqtt://storymap.jach.top:8031', {
+//     username: 'admin',
+// 	password: '1832079HH1832080',
+// 	clientId: 'clientmqttiotgateway'
+// });
+var client = mqtt.connect('mqtt://localhost:61613', {
+    username: 'admin',
+	password: 'password',
+	clientId: 'clientmqttiotgateway'
+});
+var mqttconnect = false;
+client.on('connect', function() {
+	mqttconnect = true;
+	// client.publish('records', JSON.stringify(a), {
+	// 	qos: 1,
+	// 	retain: true
+	// });
+
+	// client.end();
 });
 //建立连接
 function request_record(record) {
@@ -17,18 +32,16 @@ function request_record(record) {
 		}
 		doubleRecordList.push(a);
 	}
-	var a = {
+	var data = {
 		doubleRecords: doubleRecordList
 	};
-	client.on('connect', function() {
-
-		client.publish('records', JSON.stringify(a), {
+	if(mqttconnect){
+		client.publish('records', JSON.stringify(data), {
 			qos: 1,
 			retain: true
 		});
-
-		client.end();
-	});
+	}
+	
 }
 module.exports = {
 	request_record

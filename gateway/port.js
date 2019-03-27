@@ -92,7 +92,7 @@ function PortOpen() {
 			console.log("设备已连接");
 			
 			serialPort.on('data', function(data) {
-				console.log(data);
+				// console.log(data);
 				d += data.toString('utf8');
 				var dd = d.split('\n');
 				d = dd[dd.length - 1];

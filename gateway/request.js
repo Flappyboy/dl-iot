@@ -1,8 +1,10 @@
 var request = require("request");
-var url_gateway = 'http://storymap.jach.top:8003/api/gateway';
-var url_device = 'http://storymap.jach.top:8003/api/device';
-var url_sensor = 'http://storymap.jach.top:8003/api/sensor';
-var url_record = 'http://storymap.jach.top:8003/api/record/list';
+// var base = 'http://storymap.jach.top:8003/api';
+base = "http://localhost:8004/api"
+var url_gateway = base + '/gateway';
+var url_device = base + '/device';
+var url_sensor = base + '/sensor';
+var url_record = base + '/record/list';
 
 function request_gateway() {
 	request({
@@ -17,7 +19,10 @@ function request_gateway() {
 			"state": "ONLINE"
 		}
 	}, function(error, response, body) {
-		if(!error && response.statusCode == 200) {}
+		if(!error && response.statusCode == 200) {
+
+		}
+		
 	});
 }
 
@@ -64,6 +69,8 @@ function request_sensor(sensor,state) {
 }
 
 function request_record(record) {
+	// return;
+	// console.log(record);
 	var doubleRecordList=[];
 	for(var i=0;i<record.length;i++)
 	{
@@ -83,6 +90,9 @@ function request_record(record) {
 		
 	}, function(error, response, body) {
 		if(!error && response.statusCode == 200) {}
+		if(error){
+			console.log(error);
+		}
 	});
 }
 module.exports = {

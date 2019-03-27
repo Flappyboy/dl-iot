@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
+import { queryRecordForSensor } from '../../../../api';
+import { min } from 'moment';
 
 const recordSort = (r1, r2) => {
   if (r1.timestamp > r2.timestamp) {
@@ -24,6 +26,11 @@ export default class RecordChart extends Component {
   data = [];
   series = [];
 
+
+  interval = null;
+
+  lastTime = -1000000;
+
   selectedStart = null;
   selectedEnd = null;
 
@@ -33,26 +40,32 @@ export default class RecordChart extends Component {
     this.state = {
       sensor: props.sensor,
       record: props.record,
-      disableRealTime: props.disableRealTime,
+      realTime: props.realTime,
     };
   }
 
+  shouldComponentUpdate(newProps, newState) {
+    return true;
+  }
+
   componentWillReceiveProps(nextProps) {
+    if (!this.state.realTime && nextProps.realTime) {
+      console.log('startRealTime');
+      this.startRealTime();
+    } else if (this.state.realTime && !nextProps.realTime) {
+      console.log('stopRealTime');
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+
     this.state.sensor = nextProps.sensor;
     this.state.record = nextProps.record;
-    this.state.disableRealTime = nextProps.disableRealTime;
+    this.state.realTime = nextProps.realTime;
     this.setState({});
   }
 
-  componentDidUpdate(prevProps) {
-    // if (this.props.isLoading) {
-    //   myChart.showLoading();
-    // } else {
-    //   myChart.hideLoading();
-    //   this.loadData(this.props.data);
-    // }
-    // console.log(prevProps);
-    if (prevProps.record === this.state.record) {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps == null || prevProps.record === this.state.record) {
       return;
     }
     this.componentDidMount();
@@ -63,15 +76,107 @@ export default class RecordChart extends Component {
       this.myChart.dispose();
     }
     this.series = [];
+    this.lastTime = -1000000;
+    if (this.interval != null) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+    this.selectedStart = null;
+    this.selectedEnd = null;
+
     this.myChart = echarts.init(document.getElementById(this.state.record.mean));
     this.myChart.showLoading();
 
     const records = this.state.record.records;
+    this.update(records);
+    // console.log(this.data);
+    this.loadData();
+  }
+
+  componentWillUnmount() {
+    if (this.myChart != null) {
+      this.myChart.dispose();
+    }
+    if (this.interval != null) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  }
+
+  queringFlag = false;
+  startRealTime = () => {
+    this.state.realTime = true;
+    this.setState({});
+    console.log('real time');
+    this.interval = setInterval(this.updateRealTime.bind(this), 1000);
+  }
+
+  updateRealTime = () => {
+    if (this.queringFlag) {
+      return;
+    }
+    this.queringFlag = true;
+    const time = (new Date()).getTime() - 10 * 60 * 1000;
+    const params = {
+      id: this.state.sensor.id,
+      startTime: Math.max(this.lastTime, time),
+      endTime: -1,
+      mean: this.state.record.mean,
+    };
+
+    queryRecordForSensor(params).then((response) => {
+      console.log(`realtime ${response}`);
+      if (response.data.length === 0 || response.data[0].records.length === 0) {
+        this.queringFlag = false;
+        return;
+      }
+      const num = this.update(response.data[0].records);
+      if (num > 0) {
+        this.delRecords(time, response.data[0].records.length);
+      }
+      this.myChart.setOption({
+        series: this.series,
+      });
+
+      this.queringFlag = false;
+    }).catch((error) => {
+      console.log(error);
+      this.queringFlag = false;
+    });
+  }
+  delRecords = (time) => {
+    while (this.series.length > 0) {
+      const data = this.series[0].data;
+      if (data.length === 0) {
+        this.series.shift();
+        continue;
+      }
+      const r = data[0];
+      if (r[2] >= time) {
+        break;
+      }
+      data.shift();
+    }
+  }
+
+
+  update = (records) => {
+    let num = 0;
     records.sort(recordSort);
     // console.log(records);
-    let pre = -10000000;
+    if (records.length <= 0) {
+      return num;
+    }
+    const start = records[0].timestamp;
+    const end = records[records.length - 1].timestamp;
+
+    const interval = Math.max(10 * 1000, (start - end) * 2 / records.length);
     records.forEach((record) => {
-      if (record.timestamp - pre > 10 * 1000) {
+      const dif = record.timestamp - this.lastTime;
+      if (dif <= 0) {
+        return;
+      }
+      if (dif > interval) {
         this.data = [];
         this.series.push({
           smooth: false,
@@ -81,37 +186,22 @@ export default class RecordChart extends Component {
             width: 1,
           },
           color: 'black',
-          symbolSize: 0,
+          animation: false,
+          showSymbol: false,
+          hoverAnimation: true,
           data: this.data,
         });
       }
       const time = new Date(record.timestamp);
-      pre = record.timestamp;
-      this.data.push([time, record.value]);
+      this.lastTime = record.timestamp;
+      num += 1;
+      this.data.push([time, record.value, record.timestamp]);
     });
-    // console.log(this.data);
-    this.loadData();
-  }
-
-  componentWillUnmount() {
-    if (this.myChart != null) {
-      this.myChart.dispose();
-    }
+    return num;
   }
 
   loadData = () => {
-
-
-
-    // this.myChart.dispatchAction({
-    //   type: 'brush',
-    //   areas: [
-    //     {
-    //       brushType: 'lineX',
-    //     },
-    //   ],
-    // });
-
+    console.log(this.series);
     const option = {
       title: {
         left: 'center',
@@ -186,23 +276,7 @@ export default class RecordChart extends Component {
         this.selectedEnd = Math.round(range[1]) + 1;
       }
     });
-
-    // this.myChart.on('mouseup', (params) => {
-    //   console.log(params);
-    // });
     this.myChart.hideLoading();
-    // setInterval(() => {
-    //   for (let i = 0; i < 5; i++) {
-    //     data.shift();
-    //     data.push(randomData());
-    //   }
-
-    //   myChart.setOption({
-    //     series: [{
-    //       data,
-    //     }],
-    //   });
-    // }, 1000);
   }
 
   render() {

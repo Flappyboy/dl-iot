@@ -52,7 +52,11 @@ public class MqttInboundConfiguration {
             @Override
             public void handleMessage(Message<?> message) throws MessagingException {
                 InputRecordsDto inputRecordsDto = JSONObject.parseObject((String)message.getPayload(), InputRecordsDto.class);
-                recordService.save(inputRecordsDto.getRecords(), "mqtt");
+                if(inputRecordsDto==null || inputRecordsDto.getRecords()==null){
+                       log.error((String)message.getPayload());
+                }else {
+                    recordService.save(inputRecordsDto.getRecords(), "mqtt");
+                }
             }
         };
     }
