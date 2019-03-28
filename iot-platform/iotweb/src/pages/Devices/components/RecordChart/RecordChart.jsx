@@ -125,7 +125,7 @@ export default class RecordChart extends Component {
     };
 
     queryRecordForSensor(params).then((response) => {
-      console.log(`realtime ${response}`);
+      // console.log(`realtime ${response}`);
       if (response.data.length === 0 || response.data[0].records.length === 0) {
         this.queringFlag = false;
         return;
@@ -181,7 +181,7 @@ export default class RecordChart extends Component {
         this.series.push({
           smooth: false,
           type: 'line',
-          stack: 'a',
+          // stack: 'a',
           lineStyle: {
             width: 1,
           },
@@ -195,7 +195,7 @@ export default class RecordChart extends Component {
       const time = new Date(record.timestamp);
       this.lastTime = record.timestamp;
       num += 1;
-      this.data.push([time, record.value, record.timestamp]);
+      this.data.push([time, Math.round(record.value * 100) / 100, record.timestamp]);
     });
     return num;
   }

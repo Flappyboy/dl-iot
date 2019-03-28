@@ -31,6 +31,8 @@ public class Device extends BaseEntity {
     @JoinColumn(name = "gatewayId", referencedColumnName = "id", nullable = false)
     private Gateway gateway;
 
-    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     private List<Sensor> sensors;
+
+    private Long lastCommunication;
 }

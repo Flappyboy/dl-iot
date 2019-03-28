@@ -30,6 +30,7 @@ export default class Record extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.state.sensor = nextProps.sensor;
+    this.state.realTime = false;
     this.setState({});
     this.componentDidMount();
   }
@@ -72,6 +73,12 @@ export default class Record extends Component {
     // }
   }
 
+  onRealTimeClick = () => {
+    this.setState({
+      realTime: !this.state.realTime,
+    });
+  }
+
   onDateChange = (start, end) => {
     this.setState({
       startDate: start,
@@ -86,12 +93,14 @@ export default class Record extends Component {
       id: this.state.sensor.id,
       startTime: this.state.startDate,
       endTime: this.state.endDate,
+      limit: 700,
     };
     queryRecordForSensor(params).then((response) => {
+      this.readyForRealTime = false;
       this.setState({
         records: response.data,
+        realTime: false,
       });
-      this.readyForRealTime = false;
     }).catch((error) => {
       console.log(error);
     });
@@ -105,10 +114,11 @@ export default class Record extends Component {
       limit: 700,
     };
     queryRecordForSensor(params).then((response) => {
+      this.readyForRealTime = false;
       this.setState({
         records: response.data,
+        realTime: false,
       });
-      this.readyForRealTime = false;
     }).catch((error) => {
       console.log(error);
     });
@@ -137,7 +147,7 @@ export default class Record extends Component {
           </Col>
           <Col m={12} s={1} xs={0} />
           <Col m={2} s={4} xs={8}>
-            <Switch style={large} checkedChildren="Real Time" disabled={this.state.disableSwitch} onChange={this.onRealTimeChange} unCheckedChildren="History" />
+            <Switch style={large} checkedChildren="Real Time" disabled={this.state.disableSwitch} checked={this.state.realTime} onClick={this.onRealTimeClick} onChange={this.onRealTimeChange} unCheckedChildren="History" />
           </Col>
         </Row>
         {this.renderChart()}

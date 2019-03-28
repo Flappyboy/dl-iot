@@ -7,6 +7,7 @@ import cn.edu.nju.software.iot.iotcore.entity.Record;
 import cn.edu.nju.software.iot.iotcore.entity.Sensor;
 import cn.edu.nju.software.iot.iotcore.repository.RecordRepository;
 import cn.edu.nju.software.iot.iotcore.service.RecordService;
+import cn.edu.nju.software.iot.iotcore.service.SensorService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,21 @@ import java.util.*;
 public class RecordServiceImpl implements RecordService {
     @Autowired
     private RecordRepository recordRepository;
+    @Autowired
+    private SensorService sensorService;
 
     @Override
     public void save(List<Record> recordList) {
+        Set<String> sensorIdSet = new HashSet<>();
+        for (Record record :
+                recordList) {
+            if(record.getSensor() != null && StringUtils.isNotBlank(record.getSensor().getId()))
+                sensorIdSet.add(record.getSensor().getId());
+        }
+        Iterator<String> iterator = sensorIdSet.iterator();
+        while(iterator.hasNext()){
+            sensorService.online(iterator.next());
+        }
         recordRepository.saveAll(recordList);
     }
 
@@ -82,7 +95,7 @@ public class RecordServiceImpl implements RecordService {
         if(limit == null || limit <=0 || limit >= recordDtos.size()){
             return recordDtos;
         }
-        double ratio = limit / recordDtos.size();
+        double ratio = (double)limit / recordDtos.size();
 
         List<RecordDto> newList = new ArrayList<>();
 

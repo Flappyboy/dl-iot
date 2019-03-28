@@ -86,7 +86,7 @@ function PortOpen() {
 			serialPort.open(function(error) {
 				if(error) {
 					console.log("打开端口" + portName + "错误：" + error);
-					setTimeout(PortOpen, 5000);
+					setTimeout(PortOpen, 1000);
 				} else {
 					console.log("打开端口成功，正在监听数据中");
 					close_b = Date.parse(new Date());
@@ -233,11 +233,11 @@ function PortClose() {
 	}
 }
 
-setInterval(refreshCount(ultrasonic_record, 1, 0), 3000);
-setInterval(refreshCount(temperature_record, 2, 0), 3000);
-setInterval(refreshCount(humidity_record, 2, 1), 3000);
-setInterval(refreshCount(photoresistor_record, 3, 0), 3000);
-setInterval(PortClose(), 5000);
+setInterval(refreshCount(ultrasonic_record, 1, 0), 4000);
+setInterval(refreshCount(temperature_record, 2, 0), 4000);
+setInterval(refreshCount(humidity_record, 2, 1), 4000);
+setInterval(refreshCount(photoresistor_record, 3, 0), 4000);
+setInterval(PortClose(), 3000);
 setInterval(PortOpen(), 3000);
 module.exports = {
 	PortOpen

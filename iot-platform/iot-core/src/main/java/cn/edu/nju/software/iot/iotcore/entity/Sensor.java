@@ -28,4 +28,6 @@ public class Sensor extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "deviceId", referencedColumnName = "id", nullable = false)
     private Device device;
+
+    private Long lastCommunication;
 }

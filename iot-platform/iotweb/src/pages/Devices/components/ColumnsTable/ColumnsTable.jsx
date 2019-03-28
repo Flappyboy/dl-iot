@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import IceContainer from '@icedesign/container';
-import { Grid, Input, Table, Icon } from '@alifd/next';
+import moment from 'moment';
+import { Grid, Input, Table, Icon, Button } from '@alifd/next';
 import { queryDeviceList, queryRecordForSensor } from '../../../../api';
 
 const { Row, Col } = Grid;
@@ -31,6 +32,7 @@ export default class ColumnsTable extends Component {
       deviceList: [],
       deviceLoading: true,
       sensorList: [],
+      selectedDevice: null,
     };
   }
 
@@ -40,6 +42,30 @@ export default class ColumnsTable extends Component {
     // this.eventEmitter = emitter.addListener('query_statistics', this.queryStatistics);
 
     this.updateDevice();
+  }
+
+  refresh = () => {
+    this.setState({
+      deviceLoading: true,
+    });
+    queryDeviceList().then((response) => {
+      if (this.state.selectedDevice != null) {
+        for (let i = 0; i < response.data.length; i++) {
+          const device = response.data[i];
+          if (device.id == this.state.selectedDevice.id) {
+            this.selectDevice(i, device);
+            break;
+          }
+        }
+      }
+      this.setState({
+        deviceList: response.data,
+        deviceLoading: false,
+      });
+    })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   updateDevice = () => {
@@ -57,10 +83,11 @@ export default class ColumnsTable extends Component {
       });
   }
 
-  selectDevice = (device) => {
+  selectDevice = (index, device) => {
     // console.log(device);
     this.setState({
       sensorList: device.sensors,
+      selectedDevice: device,
     });
   }
 
@@ -96,10 +123,11 @@ export default class ColumnsTable extends Component {
         </span>
       );
     }
+    console.log(device);
     return (
       <div style={styles.userInfo}>
         <h6 style={styles.userName}>{value}</h6>
-        <p style={styles.userEmail}>{device.lastModifiedDate}</p>
+        <p style={styles.userEmail}>{moment(new Date(device.lastCommunication)).format('YYYY-MM-DD HH:mm:ss')}</p>
       </div>
     );
   };
@@ -114,7 +142,7 @@ export default class ColumnsTable extends Component {
 
   renderSelectDevice = (value, index, device) => {
     return (
-      <span onClick={this.selectDevice.bind(this, device)}>
+      <span onClick={this.selectDevice.bind(this, index, device)}>
         <Icon type="search" style={styles.editIcon} />
       </span>
     );
@@ -141,7 +169,12 @@ export default class ColumnsTable extends Component {
         <Row wrap gutter="20">
           <Col xxx="24" s="12">
             <IceContainer style={{ padding: 0 }}>
-              <h2 style={styles.title}>Device</h2>
+              <h2 style={styles.title}>
+                Device
+                &nbsp;&nbsp;
+                <Button type="normal" size="small" onClick={this.refresh}>刷新</Button>
+              </h2>
+
               {/* <div style={styles.searchInputCol}>
                 <Input
                   style={styles.searchInput}
