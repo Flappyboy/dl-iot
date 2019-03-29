@@ -52,7 +52,7 @@ public class GatewayServiceImpl implements GatewayService {
             offline(gateway);
             return gateway;
         }
-        return gatewayRepository.saveAndFlush(gateway);
+        return gatewayRepository.save(gateway);
     }
 
     @Override
@@ -80,6 +80,6 @@ public class GatewayServiceImpl implements GatewayService {
         Gateway gateway = gatewayRepository.findById(gatewayId).get();
         gateway.setState(State.ONLINE.toString());
         gateway.setLastCommunication(System.currentTimeMillis());
-        gatewayRepository.saveAndFlush(gateway);
+        gatewayRepository.save(gateway);
     }
 }

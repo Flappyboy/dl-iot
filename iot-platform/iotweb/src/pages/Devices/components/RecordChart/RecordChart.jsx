@@ -170,7 +170,8 @@ export default class RecordChart extends Component {
     const start = records[0].timestamp;
     const end = records[records.length - 1].timestamp;
 
-    const interval = Math.max(10 * 1000, (start - end) * 2 / records.length);
+    // const interval = Math.max(10 * 1000, (start - end) * 7 / records.length);
+    const interval = Math.max(10 * 1000, (start - end) / 50);
     records.forEach((record) => {
       const dif = record.timestamp - this.lastTime;
       if (dif <= 0) {

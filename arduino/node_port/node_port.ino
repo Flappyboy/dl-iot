@@ -8,8 +8,8 @@
 #define DhtPin 7
 #define buzzerPin 12
 #define ledPin 13
-float cm_now,cm_last=-1,a=0.4;
-float tem_now,tem_last=999,hum_now,hum_last=999;
+float cm_now,cm_last=-1,a=0.7;
+float tem_now,tem_last=-1,hum_now,hum_last=-1;
 int val_now,val_last=-1;
 
 dht11 DHT11;  
@@ -127,12 +127,14 @@ void TaskTemHumRead( void *pvParameters)  // This is a Task.
 
     tem_now=(float)DHT11.temperature;               //将温度值赋值给tem
     hum_now=(float)DHT11.humidity;                   //将湿度值赋给hum
-    if(tem_last!=999){
+    if(tem_last!=-1){
       tem_now=(1-a)*tem_now+a*tem_last;
     }
-    if(hum_last!=999){
+    if(hum_last!=-1){
       hum_now=(1-a)*hum_now+a*hum_last;
     }
+    tem_last=tem_now;
+    hum_last=hum_now;
     if ( xSemaphoreTake( xSerialSemaphore, ( TickType_t ) 5 ) == pdTRUE )
     {    
       
@@ -144,8 +146,8 @@ void TaskTemHumRead( void *pvParameters)  // This is a Task.
 
       xSemaphoreGive( xSerialSemaphore );
     }     
-    tem_last=tem_now;
-    hum_last=hum_now;
+//    tem_last=tem_now;
+//    hum_last=hum_now;
     vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
   }
 }

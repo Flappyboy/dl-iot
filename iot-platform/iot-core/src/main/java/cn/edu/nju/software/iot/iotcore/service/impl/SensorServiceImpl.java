@@ -72,6 +72,6 @@ public class SensorServiceImpl implements SensorService {
         deviceService.online(device.getId());
         sensor.setState(State.ONLINE.toString());
         sensor.setLastCommunication(System.currentTimeMillis());
-        sensorRepository.saveAndFlush(sensor);
+        sensorRepository.save(sensor);
     }
 }

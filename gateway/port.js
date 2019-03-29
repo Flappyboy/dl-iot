@@ -17,7 +17,7 @@ var humidity_record = [{
 }];
 var photoresistor_record = [{
 	timestamp: 0,
-	value: 0
+	value: 1200
 }];
 
 var gateway = {
@@ -67,6 +67,8 @@ var record3 = [{
 	mean: "photoresistor"
 }];
 var switchs = [0, 0, 0, 0]; //设备上线开关
+var lightWarnNum = 0;
+var temperatureActionNum = 0;
 
 var serialPort = new SerialPort(
 	"COM3", {
@@ -95,12 +97,12 @@ function PortOpen() {
 
 					serialPort.on('data', function(data) {
 						close_b = Date.parse(new Date());
-						//				 console.log(data);
+										//  console.log(data);
 						d += data.toString('utf8');
 						var dd = d.split('\n');
 						d = dd[dd.length - 1];
 						dd.pop();
-
+						// console.log(dd);
 						for(var i = 0; i < dd.length; i++) {
 							var sub_dd = dd[i].split(':');
 							var o = {
@@ -125,6 +127,8 @@ function PortOpen() {
 									}
 								case "Tempeature":
 									{
+										// console.log(o.value);
+										// console.log(switchs[2]);
 										if(switchs[2] == 0 && o.value != 0) {
 											req.request_sensor(sensor2, "ONLINE");
 											switchs[2] = 1;
@@ -156,20 +160,36 @@ function PortOpen() {
 									}
 							}
 						}
-
-						if(photoresistor_record[photoresistor_record.length - 1].value < 600) {
-							//				console.log("111")
-							serialPort.write('2');
+						
+						if(photoresistor_record.length > 1 && photoresistor_record[photoresistor_record.length - 1].value < 1000) {
+							// console.log("111")
+							if(lightWarnNum < 0){
+								serialPort.write('3');
+							}else{
+								lightWarnNum--;
+							}
 						} else {
-							//				console.log("000")
-							serialPort.write('3');
+							//console.log("000")
+							if(lightWarnNum > 30){
+								serialPort.write('2');
+							}else{
+								lightWarnNum ++;
+							}
 						}
-						if(temperature_record[temperature_record.length - 1].value > 25.00) {
+						if(temperature_record[temperature_record.length - 1].value > 23.00) {
 							//				console.log("222")
-							serialPort.write('1');
+							if(temperatureActionNum < 0){
+								serialPort.write('1');
+							}else{
+								temperatureActionNum--;
+							}
 						} else {
 							//				console.log("333")
-							serialPort.write('0');
+							if(temperatureActionNum > 20){
+								serialPort.write('0');
+							}else{
+								temperatureActionNum++;
+							}
 						}
 
 					});

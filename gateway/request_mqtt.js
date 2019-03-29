@@ -1,14 +1,14 @@
 var mqtt = require('mqtt');
-// var client = mqtt.connect('mqtt://storymap.jach.top:8031', {
-//     username: 'admin',
-// 	password: '1832079HH1832080',
-// 	clientId: 'clientmqttiotgateway'
-// });
-var client = mqtt.connect('mqtt://localhost:61613', {
+var client = mqtt.connect('mqtt://storymap.jach.top:8031', {
     username: 'admin',
-	password: 'password',
+	password: '1832079HH1832080',
 	clientId: 'clientmqttiotgateway'
 });
+// var client = mqtt.connect('mqtt://localhost:61613', {
+//     username: 'admin',
+// 	password: 'password',
+// 	clientId: 'clientmqttiotgateway'
+// });
 var mqttconnect = false;
 client.on('connect', function() {
 	mqttconnect = true;

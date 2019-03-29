@@ -82,9 +82,9 @@ public class DeviceServiceImpl implements DeviceService {
         }
         Device device = deviceRepository.findById(deviceId).get();
 
-        gatewayService.online(device.getGateway().getId());
+        // gatewayService.online(device.getGateway().getId());
         device.setState(State.ONLINE.toString());
         device.setLastCommunication(System.currentTimeMillis());
-        deviceRepository.saveAndFlush(device);
+        deviceRepository.save(device);
     }
 }

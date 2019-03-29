@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Switch, DatePicker, TimePicker, Button, Grid } from '@alifd/next';
+import { Switch, DatePicker, TimePicker, Button, Grid, Icon } from '@alifd/next';
 import moment from 'moment';
 import RecordChart from '../RecordChart';
 import { queryRecordForSensor } from '../../../../api';
@@ -20,6 +20,7 @@ export default class Record extends Component {
     super(props);
     this.state = {
       sensor: props.sensor,
+      loading: true,
       realTime: false,
       disableSwitch: false,
       records: [],
@@ -32,6 +33,9 @@ export default class Record extends Component {
     this.state.sensor = nextProps.sensor;
     this.state.realTime = false;
     this.setState({});
+    this.setState({
+      loading: true,
+    });
     this.componentDidMount();
   }
 
@@ -54,10 +58,14 @@ export default class Record extends Component {
     queryRecordForSensor(params).then((response) => {
       this.setState({
         records: response.data,
+        loading: false,
       });
       this.readyForRealTime = true;
     }).catch((error) => {
       console.log(error);
+      this.setState({
+        loading: false,
+      });
     });
   }
 
@@ -95,14 +103,21 @@ export default class Record extends Component {
       endTime: this.state.endDate,
       limit: 700,
     };
+    this.setState({
+      loading: true,
+    });
     queryRecordForSensor(params).then((response) => {
       this.readyForRealTime = false;
       this.setState({
         records: response.data,
         realTime: false,
+        loading: false,
       });
     }).catch((error) => {
       console.log(error);
+      this.setState({
+        loading: false,
+      });
     });
   }
 
@@ -113,14 +128,21 @@ export default class Record extends Component {
       endTime: end,
       limit: 700,
     };
+    this.setState({
+      loading: true,
+    });
     queryRecordForSensor(params).then((response) => {
       this.readyForRealTime = false;
       this.setState({
         records: response.data,
         realTime: false,
+        loading: false,
       });
     }).catch((error) => {
       console.log(error);
+      this.setState({
+        loading: false,
+      });
     });
   }
 
@@ -135,8 +157,21 @@ export default class Record extends Component {
   }
 
   render() {
+    let loading = null;
+    if (this.state.loading) {
+      loading = (<Icon type="loading" />)
+    }
     return (
       <div>
+        <Row>
+          <Col m={2} s={1} xs={12} >
+            <h2 style={{ margin: 3 }}>{this.state.sensor.id}</h2>
+          </Col>
+          <Col m={1} s={1} xs={2} >
+            {loading}
+          </Col>
+
+        </Row>
         <Row >
           <Col m={2} s={1} xs={0} />
           <Col map={5} s={7} xs={12}>

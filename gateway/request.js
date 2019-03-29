@@ -1,6 +1,6 @@
 var request = require("request");
-// var base = 'http://storymap.jach.top:8003/api';
-base = "http://localhost:8004/api"
+var base = 'http://storymap.jach.top:8003/api';
+// base = "http://localhost:8004/api"
 var url_gateway = base + '/gateway';
 var url_device = base + '/device';
 var url_sensor = base + '/sensor';
