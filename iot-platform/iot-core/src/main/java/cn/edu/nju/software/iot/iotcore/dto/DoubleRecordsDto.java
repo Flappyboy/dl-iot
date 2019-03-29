@@ -17,6 +17,9 @@ public class DoubleRecordsDto extends RecordsDto{
     public List<Record> toDoubleRecordList(){
         List<Record> list = new ArrayList<>();
         for(DoubleRecordDto doubleRecordDto: recordList){
+            if(doubleRecordDto == null || doubleRecordDto.getValue() == null){
+                continue;
+            }
             DoubleRecord doubleRecord = new DoubleRecord();
             Sensor sensor = new Sensor();
             sensor.setId(this.getSensorId());

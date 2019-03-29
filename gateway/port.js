@@ -66,30 +66,35 @@ var record3 = [{
 	unit: "lx",
 	mean: "photoresistor"
 }];
-var switchs = [0, 0, 0, 0]; //设备上线开关
+var switchs = [0, 0, 0, 0]; //sensor上线开关
+var deviceOnline = false;
 var lightWarnNum = 0;
 var temperatureActionNum = 0;
 
-var serialPort = new SerialPort(
-	"COM3", {
-		autoOpen: false,
-		baudRate: 9600, //波特率
-		dataBits: 8, //数据位
-		parity: 'none', //奇偶校验
-		stopBits: 1, //停止位
-		flowControl: false
-	}, false);
+var serialPort = null;
 var d = '';
 var close_b = Date.parse(new Date());
 
 function PortOpen() {
 	return function n() {
+		if(serialPort == null){
+			serialPort = new SerialPort(
+			"COM3", {
+				autoOpen: false,
+				baudRate: 9600, //波特率
+				dataBits: 8, //数据位
+				parity: 'none', //奇偶校验
+				stopBits: 1, //停止位
+				flowControl: false
+			}, false);
+		}
 		if(!serialPort.isOpen) {
 			serialPort.open(function(error) {
 				if(error) {
 					console.log("打开端口" + portName + "错误：" + error);
 					setTimeout(PortOpen, 1000);
 				} else {
+					deviceOnline = true;
 					console.log("打开端口成功，正在监听数据中");
 					close_b = Date.parse(new Date());
 					req.request_device(device,"ONLINE");
@@ -99,6 +104,7 @@ function PortOpen() {
 						close_b = Date.parse(new Date());
 										//  console.log(data);
 						d += data.toString('utf8');
+						// console.log(d);
 						var dd = d.split('\n');
 						d = dd[dd.length - 1];
 						dd.pop();
@@ -158,6 +164,9 @@ function PortOpen() {
 										photoresistor_record.push(o);
 										break;
 									}
+								default:
+									console.log('wrong data '+sub_dd[0]+' '+sub_dd[1]);
+									break;
 							}
 						}
 						
@@ -241,14 +250,39 @@ function refreshCount(record, index, subindex) {
 
 function PortClose() {
 	return function n() {
-		if(Date.parse(new Date()) - close_b > 3000 && serialPort.isOpen) {
+		// if(Date.parse(new Date()) - close_b > 3000 && serialPort.isOpen) {
 			
-			serialPort.close(function(error) {
-				console.log("端口已关闭");
-				req.request_device(device,"OFFLINE");
-				console.log("设备已下线");
-				switchs=[0,0,0,0];
-			});
+		// 	serialPort.close(function(error) {
+		// 		console.log("端口已关闭");
+		// 		req.request_device(device,"OFFLINE");
+		// 		console.log("设备已下线");
+		// 		switchs=[0,0,0,0];
+		// 	});
+		// }
+		if(deviceOnline && !serialPort.isOpen){
+			deviceOnline = false;
+			console.log("端口已关闭");
+			req.request_device(device,"OFFLINE");
+			console.log("设备已下线");
+			serialPort=null;
+			switchs=[0,0,0,0];
+			d='';
+			var ultrasonic_record = [{
+				timestamp: 0,
+				value: 0
+			}];
+			var temperature_record = [{
+				timestamp: 0,
+				value: 0
+			}];
+			var humidity_record = [{
+				timestamp: 0,
+				value: 0
+			}];
+			var photoresistor_record = [{
+				timestamp: 0,
+				value: 1200
+			}];
 		}
 	}
 }
