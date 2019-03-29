@@ -108,7 +108,7 @@ export default class RecordChart extends Component {
     this.state.realTime = true;
     this.setState({});
     console.log('real time');
-    this.interval = setInterval(this.updateRealTime.bind(this), 1000);
+    this.interval = setInterval(this.updateRealTime.bind(this), 2000);
   }
 
   updateRealTime = () => {
@@ -131,8 +131,14 @@ export default class RecordChart extends Component {
         return;
       }
       const num = this.update(response.data[0].records);
+      let nn = 0;
       if (num > 0) {
-        this.delRecords(time, response.data[0].records.length);
+        nn = this.delRecords(time, response.data[0].records.length);
+      }
+      if (nn > 100) {
+        this.myChart.setOption({
+          series: [],
+        });
       }
       this.myChart.setOption({
         series: this.series,
@@ -145,18 +151,27 @@ export default class RecordChart extends Component {
     });
   }
   delRecords = (time) => {
+    // console.log(this.series);
+    // console.log(time);
+    let nn = 0;
     while (this.series.length > 0) {
       const data = this.series[0].data;
+
       if (data.length === 0) {
+        // console.log('series shift');
         this.series.shift();
         continue;
       }
       const r = data[0];
       if (r[2] >= time) {
-        break;
+        // console.log('break');
+        return nn;
       }
+      // console.log('data shift');
+      nn += 1;
       data.shift();
     }
+    return nn;
   }
 
 
@@ -202,7 +217,7 @@ export default class RecordChart extends Component {
   }
 
   loadData = () => {
-    console.log(this.series);
+    // console.log(this.series);
     const option = {
       title: {
         left: 'center',
